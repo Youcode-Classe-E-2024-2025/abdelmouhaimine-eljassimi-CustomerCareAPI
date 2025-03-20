@@ -3,9 +3,15 @@ namespace App\Services;
 
 use App\Models\Ticket;
 use Illuminate\Support\Facades\Auth;
+use App\Repositories\ticketRepository;
 
 class TicketService
 {
+    protected $ticketRepository;
+
+    public function __construct(ticketRepository $ticketRepository){
+        $this->ticketRepository = $ticketRepository;
+    }
     public function getAllTickets()
     {
         return Ticket::all();
@@ -18,5 +24,10 @@ class TicketService
             'description' => $data['description'],
             'priority' => $data['priority']
         ]);
+    }
+
+    public function getTicketById($id)
+    {
+        return $this->ticketRepository->findById($id);
     }
 }
