@@ -23,7 +23,11 @@ class AuthService
             'password' => Hash::make($data['password']),
             'role' => $data['role']
         ]);
-        return ['token' => $user->createToken('API Token')->plainTextToken];
+
+            return [
+                'message' => 'User created successfully',
+                'user' => $user,
+            ];
         }
     }
 
