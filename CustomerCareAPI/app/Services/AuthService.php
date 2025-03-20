@@ -37,10 +37,7 @@ class AuthService
         if (!$user || !Hash::check($data['password'], $user->password)) {
             throw ValidationException::withMessages(['email' => 'Invalid credentials']);
         }
-        return [
-            'message' => 'User logged successfully',
-            'user' => $user,
-        ];
+        return ['token' => $user->createToken('API Token')->plainTextToken];
     }
 
     public function logout($user)
