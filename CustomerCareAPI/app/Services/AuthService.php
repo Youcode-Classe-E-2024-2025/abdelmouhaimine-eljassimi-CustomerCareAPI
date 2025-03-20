@@ -43,4 +43,11 @@ class AuthService
         ];
     }
 
+    public function logout($user)
+    {
+        $user->tokens()->delete();
+        return ['message' => 'Logged out'];
+    }
+
+
 }
