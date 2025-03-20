@@ -26,4 +26,8 @@ class TicketController extends Controller
         $data = $request->validated();
         return response()->json($this->ticketService->createTicket($data), 201);
     }
+
+    public function show($id){
+        return response()->json([$this->ticketService->getTicketById($id)], 200);
+    }
 }
