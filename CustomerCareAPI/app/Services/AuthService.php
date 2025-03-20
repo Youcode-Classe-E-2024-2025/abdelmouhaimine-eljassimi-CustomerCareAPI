@@ -31,4 +31,16 @@ class AuthService
         }
     }
 
+    public function login($data)
+    {
+        $user = $this->userRepository->findByEmail($data['email']);
+        if (!$user || !Hash::check($data['password'], $user->password)) {
+            throw ValidationException::withMessages(['email' => 'Invalid credentials']);
+        }
+        return [
+            'message' => 'User logged successfully',
+            'user' => $user,
+        ];
+    }
+
 }
