@@ -11,4 +11,10 @@ class ticketRepository{
     {
         return Ticket::create($data);
     }
+    public function update(Ticket $ticket, array $data)
+    {
+        $ticket->update($data);
+        return $ticket;
+    }
+
 }
