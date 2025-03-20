@@ -10,4 +10,13 @@ class TicketService
     {
         return Ticket::all();
     }
+    public function createTicket($data)
+    {
+        return Ticket::create([
+            'user_id' => Auth::id(),
+            'title' => $data['title'],
+            'description' => $data['description'],
+            'priority' => $data['priority']
+        ]);
+    }
 }
