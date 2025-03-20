@@ -18,7 +18,7 @@ class TicketService
     }
     public function createTicket($data)
     {
-        return Ticket::create([
+        return $this->ticketRepository->create([
             'user_id' => Auth::id(),
             'title' => $data['title'],
             'description' => $data['description'],
