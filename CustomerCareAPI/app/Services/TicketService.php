@@ -36,4 +36,9 @@ class TicketService
     {
         return $this->ticketRepository->update($ticket, $data);
     }
+
+    public function deleteTicket($ticket)
+    {
+        return $this->ticketRepository->delete($ticket);
+    }
 }
