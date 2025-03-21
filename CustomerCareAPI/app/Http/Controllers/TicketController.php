@@ -41,4 +41,10 @@ class TicketController extends Controller
         ]);
         return response()->json($this->ticketService->updateTicket($ticket, $data));
     }
+
+    public function destroy(Ticket $ticket)
+    {
+        $this->ticketService->deleteTicket($ticket);
+        return response()->json(['message' => 'Ticket deleted']);
+    }
 }
