@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateTicketRequest;
+use App\Models\Ticket;
 use App\Services\TicketService;
 use Illuminate\Http\Request;
 
@@ -29,5 +30,15 @@ class TicketController extends Controller
 
     public function show($id){
         return response()->json([$this->ticketService->getTicketById($id)], 200);
+    }
+
+
+    public function update(Request $request, Ticket $ticket)
+    {
+        $data = $request->validate([
+            'status' => 'in:open,in_progress,resolved,closed',
+            'agent_id' => 'nullable|exists:users,id'
+        ]);
+        return response()->json($this->ticketService->updateTicket($ticket, $data));
     }
 }

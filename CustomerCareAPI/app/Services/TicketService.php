@@ -30,4 +30,10 @@ class TicketService
     {
         return $this->ticketRepository->findById($id);
     }
+
+
+    public function updateTicket($ticket, $data)
+    {
+        return $this->ticketRepository->update($ticket, $data);
+    }
 }
