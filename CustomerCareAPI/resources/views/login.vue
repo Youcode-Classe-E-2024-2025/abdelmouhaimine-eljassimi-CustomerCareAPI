@@ -22,17 +22,6 @@
                     </div>
                 </div>
 
-                <div class="mb-6">
-                    <label class="flex items-center">
-                        <input type="radio" name="role" value="user" checked class="h-4 w-4 text-blue-600">
-                        <span class="ml-2 text-gray-700">User</span>
-                    </label>
-                    <label class="flex items-center mt-2">
-                        <input type="radio" name="role" value="agent" class="h-4 w-4 text-blue-600">
-                        <span class="ml-2 text-gray-700">Agent</span>
-                    </label>
-                </div>
-
                 <button type="submit"
                         class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors">
                     Sign In
@@ -41,7 +30,7 @@
 
             <div class="text-center mt-6">
                 <p class="text-gray-600">Don't have an account?
-                    <a href="register.html" class="text-blue-600 hover:underline">Register</a>
+                    <router-link to="/register" class="text-blue-600 hover:underline">Sing Up</router-link>
                 </p>
             </div>
         </div>
