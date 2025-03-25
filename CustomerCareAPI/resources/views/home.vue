@@ -218,12 +218,9 @@ export default {
         switchView(view) {
             this.currentView = view;
         },
-        createTicket() {
-
-        },
         viewTicket(ticketId) {
-
-        },
+            this.$router.push({ name: 'TicketDetails', params: { id: ticketId } });
+        }
     },
     mounted() {
         this.fetchTickets();

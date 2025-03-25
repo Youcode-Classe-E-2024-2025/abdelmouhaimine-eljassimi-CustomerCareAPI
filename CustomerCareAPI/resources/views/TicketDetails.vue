@@ -69,33 +69,31 @@
         </nav>
 
         <!-- Ticket Header Card -->
-        <div class="bg-white rounded-lg shadow-md overflow-hidden mb-6">
+        <div v-if="ticket" class="bg-white rounded-lg shadow-md overflow-hidden mb-6">
             <div class="p-6">
                 <div class="flex justify-between items-start">
                     <div>
-                        <h1 class="text-2xl font-bold text-gray-900">
-                            Login issue with my account
-                        </h1>
+                        <h1 class="text-2xl font-bold text-gray-900">{{ ticket.title }}</h1>
                         <p class="mt-1 text-sm text-gray-500">
-                            Created on Mar 24, 2025 at 10:34 AM
+                            Created on {{ formatDate(ticket.created_at) }}
                         </p>
                     </div>
-                    <span class="px-3 py-1 text-sm font-semibold rounded-full bg-green-100 text-green-800">
-                            Open
-                        </span>
+                    <span :class="getStatusBadgeClass(ticket.status)" class="px-3 py-1 text-sm font-semibold rounded-full">
+          {{ ticket.status }}
+        </span>
                 </div>
 
                 <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
                         <h3 class="text-sm font-medium text-gray-500">Priority</h3>
-                        <p class="mt-2 text-sm text-gray-900">Medium</p>
+                        <p class="mt-2 text-sm text-gray-900">{{ ticket.priority }}</p>
                     </div>
                 </div>
 
                 <div class="mt-6">
                     <h3 class="text-sm font-medium text-gray-500">Description</h3>
                     <div class="mt-2 p-4 bg-gray-50 rounded-md text-sm text-gray-900">
-                        <p>I'm having trouble logging into my account. When I enter my credentials and click the login button, the page refreshes but I remain on the login page. I've tried resetting my password but the issue persists. This started happening yesterday and I've tried using different browsers with the same result.</p>
+                        <p>{{ ticket.description }}</p>
                     </div>
                 </div>
             </div>
@@ -134,7 +132,6 @@
             </div>
         </div>
 
-        <!-- Conversation Card -->
         <div class="bg-white rounded-lg shadow-md overflow-hidden mb-6">
             <div class="p-6">
                 <h2 class="text-lg font-medium text-gray-900 mb-4">
@@ -214,5 +211,55 @@
 </main>
 </template>
 
-<script setup lang="ts">
+<script>
+import axios from 'axios';
+
+export default {
+    data() {
+        return {
+            ticket: null,
+            error: null,
+        };
+    },
+    methods: {
+        async fetchTicketDetails() {
+            const ticketId = this.$route.params.id;
+            const userToken = localStorage.getItem('userToken');
+            try {
+                const response = await axios.get(`http://127.0.0.1:8000/api/tickets/${ticketId}`, {
+                    headers: {
+                        Authorization: `Bearer ${userToken}`,
+                    },
+                });
+                this.ticket = response.data[0];
+            } catch (err) {
+                console.error('Error fetching ticket details:', err);
+                this.error = 'Failed to load ticket details. Please try again later.';
+            }
+        },
+        formatDate(date) {
+            return new Date(date).toLocaleString();
+        },
+        getStatusBadgeClass(status) {
+            switch (status) {
+                case 'open':
+                    return 'bg-green-500 text-white';
+                case 'In Progress':
+                    return 'bg-blue-500 text-white';
+                case 'Resolved':
+                    return 'bg-yellow-500 text-white';
+                case 'Closed':
+                    return 'bg-gray-500 text-white';
+                default:
+                    return '';
+            }
+        },
+    },
+    mounted() {
+        this.fetchTicketDetails();
+    },
+};
 </script>
+
+<style scoped>
+</style>

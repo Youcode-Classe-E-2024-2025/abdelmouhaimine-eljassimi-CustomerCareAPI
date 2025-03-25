@@ -18,8 +18,10 @@ const routes = [
         component: () => import("../views/createTicket.vue"),
     },
     {
-        path: "/TicketDetails",
+        path:'/ticket-details/:id',
+        name: 'TicketDetails',
         component: () => import("../views/TicketDetails.vue"),
+        props: true,
     },
 
 ];
