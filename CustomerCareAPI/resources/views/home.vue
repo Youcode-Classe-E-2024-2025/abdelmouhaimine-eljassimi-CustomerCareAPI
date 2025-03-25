@@ -42,7 +42,7 @@
                 <div class="px-4 py-6 sm:px-0">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-bold text-gray-800">My Tickets</h2>
-                        <router-link to="/createTicket" v-if="userRole === 'agent'" class="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors">Create New Ticket</router-link>
+                        <router-link to="/createTicket" v-if="userRole === 'user'" class="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors">Create New Ticket</router-link>
 
                     </div>
 
@@ -76,7 +76,7 @@
                     </div>
                 </div>
             </div>            <!-- User View -->
-            <div v-if="currentView === 'user' && !loading && !error">
+            <div v-if="userRole === 'agent' && !loading && !error">
                 <div class="px-4 py-6 sm:px-0">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-bold text-gray-800">All Tickets</h2>
@@ -103,7 +103,7 @@
                                     <span>{{ formatDate(ticket.created_at) }}</span>
                                 </div>
                             </div>
-                            <div class="px-5 py-3 bg-gray-50 border-t border-gray-100">
+                            <div v-if="userRole === 'agent'" class="px-5 py-3 bg-gray-50 border-t border-gray-100">
                                 <a @click.prevent="openTicket(ticket.id)" class="w-full block text-center py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors text-sm">
                                     Open Ticket
                                 </a>
@@ -165,10 +165,9 @@ export default {
                         'Authorization': `Bearer ${userToken}`
                     }
                 });
-
                 this.tickets = response.data;
-                this.ticketsOpened = this.tickets.filter(ticket => ticket.agent_id === this.userId);
-                this.ticketsNotOpened = this.tickets.filter(ticket => ticket.agent_id === null);
+                this.ticketsOpened = this.tickets.filter(ticket => ticket.agent_id === this.userId || ticket.user_id === this.userId);
+                this.ticketsNotOpened = this.tickets.filter(ticket => ticket.agent_id === null && ticket.user_id !== this.userId);
             } catch (err) {
                 console.error('Error fetching tickets:', err);
                 this.error = 'Failed to load tickets. Please try again later.';

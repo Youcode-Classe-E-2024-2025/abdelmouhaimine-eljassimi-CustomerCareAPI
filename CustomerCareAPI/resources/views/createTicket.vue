@@ -34,6 +34,7 @@
 
 <script>
 import { ref } from "vue";
+import router from "../js/router.js";
 
 export default {
     setup() {
@@ -79,6 +80,7 @@ export default {
                 if (response.ok) {
                     message.value = "Ticket created successfully!";
                     ticket.value = { title: "", description: "", priority: "low", status: "open" };
+                    await router.push('/home');
                 } else {
                     error.value = data.message || "Error creating ticket.";
                 }
