@@ -6,6 +6,7 @@ use App\Http\Requests\LoginUserRequest;
 use Illuminate\Http\Request;
 use App\Services\AuthService;
 use App\Http\Requests\RegisterUserRequest;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * @OA\Info(
@@ -133,4 +134,11 @@ class AuthController extends Controller
     {
         return response()->json($this->authService->logout($request->user()));
     }
+
+    public function getUserDetails()
+    {
+        $user = Auth::user();
+        return response()->json(['user' => $user ]);
+    }
+
 }

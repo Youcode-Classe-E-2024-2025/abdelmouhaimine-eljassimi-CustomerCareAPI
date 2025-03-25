@@ -99,7 +99,7 @@
             </div>
         </div>
 
-        <div id="agentActions" class="bg-white rounded-lg shadow-md overflow-hidden mb-6" style="display: none;">
+        <div v-if="userRole === 'agent'" id="agentActions" class="bg-white rounded-lg shadow-md overflow-hidden mb-6" style="display: block;">
             <div class="p-6">
                 <h2 class="text-lg font-medium text-gray-900 mb-4">
                     Agent Actions
@@ -219,6 +219,7 @@ export default {
         return {
             ticket: null,
             error: null,
+            userRole:null,
         };
     },
     methods: {
@@ -235,6 +236,27 @@ export default {
             } catch (err) {
                 console.error('Error fetching ticket details:', err);
                 this.error = 'Failed to load ticket details. Please try again later.';
+            }
+        },
+        async fetchUserRole(){
+            try {
+                const token = localStorage.getItem('userToken');
+
+                if (!token) {
+                    new Error('No token found');
+                }
+                const response = await axios.get('/api/user', {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    }
+                });
+
+                if (response.status === 200) {
+                    this.userRole = response.data.role;
+                }
+            } catch (error) {
+                console.error('Error fetching user role:', error);
+                return null;
             }
         },
         formatDate(date) {
@@ -254,9 +276,11 @@ export default {
                     return '';
             }
         },
+
     },
     mounted() {
         this.fetchTicketDetails();
+        this.fetchUserRole();
     },
 };
 </script>

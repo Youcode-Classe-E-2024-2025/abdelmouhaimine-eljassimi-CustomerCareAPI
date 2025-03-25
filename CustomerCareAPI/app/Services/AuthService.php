@@ -2,6 +2,7 @@
 namespace App\Services;
 
 use App\Repositories\UserRepository;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
@@ -37,6 +38,7 @@ class AuthService
         if (!$user || !Hash::check($data['password'], $user->password)) {
             throw ValidationException::withMessages(['email' => 'Invalid credentials']);
         }
+       Auth::login($user);
         return ['token' => $user->createToken('API Token')->plainTextToken];
     }
 
