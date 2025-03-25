@@ -104,7 +104,7 @@
                                 </div>
                             </div>
                             <div class="px-5 py-3 bg-gray-50 border-t border-gray-100">
-                                <a href="#" @click.prevent="viewTicket(ticket.id)" class="w-full block text-center py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors text-sm">
+                                <a @click.prevent="openTicket(ticket.id)" class="w-full block text-center py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors text-sm">
                                     Open Ticket
                                 </a>
                             </div>
@@ -199,6 +199,29 @@ export default {
         },
         viewTicket(ticketId) {
             this.$router.push({ name: 'TicketDetails', params: { id: ticketId } });
+        },
+        openTicket(ticketId) {
+
+            const userId = this.userId;
+            const token = localStorage.getItem('userToken');
+            const ticket = this.ticketsNotOpened.find(t => t.id === ticketId);
+
+            axios.put(`http://127.0.0.1:8000/api/tickets/${ticketId}`, {
+                agent_id: userId,
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                }
+            }).then(response => {
+                    ticket.agent_id = userId;
+                    ticket.status = 'In Progress';
+                    this.ticketsOpened.push(ticket);
+                    this.ticketsNotOpened = this.ticketsNotOpened.filter(t => t.id !== ticketId);
+                })
+                .catch(error => {
+                    console.error('Error opening ticket:', error);
+                    this.error = 'Failed to open ticket. Please try again later.';
+                });
         }
     },
     mounted() {
