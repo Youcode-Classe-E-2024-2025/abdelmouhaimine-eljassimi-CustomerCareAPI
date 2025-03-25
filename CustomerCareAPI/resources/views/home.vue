@@ -12,21 +12,6 @@
                             <a href="#" class="border-blue-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                                 Dashboard
                             </a>
-                            <a href="#" @click.prevent="switchView('user')" :class="[
-                        'border-transparent inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium',
-                        currentView === 'user' ? 'border-blue-500 text-gray-900' : 'text-gray-500 hover:border-gray-300 hover:text-gray-700'
-                      ]">
-                                My Tickets
-                            </a>
-                            <a href="#" @click.prevent="switchView('agent')" :class="[
-                        'border-transparent inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium',
-                        currentView === 'agent' ? 'border-blue-500 text-gray-900' : 'text-gray-500 hover:border-gray-300 hover:text-gray-700'
-                      ]">
-                                All Tickets
-                            </a>
-                            <a href="#" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                                Settings
-                            </a>
                         </nav>
                     </div>
                     <div class="flex items-center">
@@ -57,18 +42,18 @@
                 <div class="px-4 py-6 sm:px-0">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-bold text-gray-800">My Tickets</h2>
-                        <router-link to="/createTicket" class="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors">Create New Ticket</router-link>
+                        <router-link to="/createTicket" v-if="userRole === 'agent'" class="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors">Create New Ticket</router-link>
 
                     </div>
 
                     <!-- No Tickets Message -->
-                    <div v-if="tickets.length === 0" class="text-center py-10 bg-white rounded-lg shadow-md">
+                    <div v-if="ticketsOpened.length === 0" class="text-center py-10 bg-white rounded-lg shadow-md">
                         <p class="text-gray-500">No tickets found. Create a new ticket to get started.</p>
                     </div>
 
                     <!-- Ticket Cards -->
                     <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <div v-for="ticket in tickets" :key="ticket.id" class="bg-white rounded-lg shadow-md overflow-hidden">
+                        <div v-for="ticket in ticketsOpened" :key="ticket.id" class="bg-white rounded-lg shadow-md overflow-hidden">
                             <div class="p-5">
                                 <div class="flex justify-between items-start mb-4">
                                     <h3 class="text-lg font-semibold text-blue-600 truncate">{{ ticket.title }}</h3>
@@ -90,33 +75,21 @@
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Agent View -->
-            <div v-if="currentView === 'agent' && !loading && !error">
+            </div>            <!-- User View -->
+            <div v-if="currentView === 'user' && !loading && !error">
                 <div class="px-4 py-6 sm:px-0">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-bold text-gray-800">All Tickets</h2>
-                        <div class="flex space-x-2">
-                            <select v-model="statusFilter" class="bg-white border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <option value="">All Statuses</option>
-                                <option value="Open">Open</option>
-                                <option value="In Progress">In Progress</option>
-                                <option value="Resolved">Resolved</option>
-                                <option value="Closed">Closed</option>
-                            </select>
-                            <input v-model="searchTerm" type="text" placeholder="Search tickets..." class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        </div>
                     </div>
 
                     <!-- No Tickets Message -->
-                    <div v-if="filteredTickets.length === 0" class="text-center py-10 bg-white rounded-lg shadow-md">
-                        <p class="text-gray-500">No tickets found matching your filters.</p>
+                    <div v-if="ticketsNotOpened.length === 0" class="text-center py-10 bg-white rounded-lg shadow-md">
+                        <p class="text-gray-500">No tickets found. Create a new ticket to get started.</p>
                     </div>
 
                     <!-- Ticket Cards -->
                     <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <div v-for="ticket in filteredTickets" :key="ticket.id" class="bg-white rounded-lg shadow-md overflow-hidden">
+                        <div v-for="ticket in ticketsNotOpened" :key="ticket.id" class="bg-white rounded-lg shadow-md overflow-hidden">
                             <div class="p-5">
                                 <div class="flex justify-between items-start mb-4">
                                     <h3 class="text-lg font-semibold text-blue-600 truncate">{{ ticket.title }}</h3>
@@ -125,10 +98,9 @@
                   </span>
                                 </div>
                                 <p class="text-sm text-gray-600 mb-4 line-clamp-2">{{ ticket.description }}</p>
-                                <div class="flex flex-col gap-1 text-xs text-gray-500 mb-4">
+                                <div class="flex justify-between items-center text-xs text-gray-500">
                                     <span>ID: #{{ ticket.id }}</span>
-                                    <span>User: {{ ticket.user_name || 'Anonymous' }}</span>
-                                    <span>Created: {{ formatDate(ticket.created_at) }}</span>
+                                    <span>{{ formatDate(ticket.created_at) }}</span>
                                 </div>
                             </div>
                             <div class="px-5 py-3 bg-gray-50 border-t border-gray-100">
@@ -152,32 +124,37 @@ export default {
         return {
             loading: false,
             error: null,
-            currentView: 'user', // Default view is 'user'
+            currentView: 'user',
             tickets: [],
-            statusFilter: '',
-            searchTerm: '',
-            userRole: 'user', // Can be 'user', 'agent', or 'admin'
+            ticketsOpened: [],
+            ticketsNotOpened: [],
+            userRole : null,
+            userId : null
         };
     },
-    computed: {
-        filteredTickets() {
-            let filtered = this.tickets;
-
-            if (this.statusFilter) {
-                filtered = filtered.filter(ticket => ticket.status === this.statusFilter);
-            }
-
-            if (this.searchTerm) {
-                filtered = filtered.filter(ticket =>
-                    ticket.title.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-                    ticket.description.toLowerCase().includes(this.searchTerm.toLowerCase())
-                );
-            }
-
-            return filtered;
-        },
-    },
     methods: {
+        async fetchUserRole(){
+            try {
+                const token = localStorage.getItem('userToken');
+
+                if (!token) {
+                    new Error('No token found');
+                }
+                const response = await axios.get('/api/user', {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    }
+                });
+
+                if (response.status === 200) {
+                    this.userRole = response.data.role;
+                    this.userId = response.data.id;
+                }
+            } catch (error) {
+                console.error('Error fetching user role:', error);
+                return null;
+            }
+        },
         async fetchTickets() {
             try {
                 this.loading = true;
@@ -191,6 +168,8 @@ export default {
                 });
 
                 this.tickets = response.data;
+                this.ticketsOpened = this.tickets.filter(ticket => ticket.agent_id === this.userId);
+                this.ticketsNotOpened = this.tickets.filter(ticket => ticket.agent_id === null);
             } catch (err) {
                 console.error('Error fetching tickets:', err);
                 this.error = 'Failed to load tickets. Please try again later.';
@@ -203,8 +182,8 @@ export default {
         },
         getStatusBadgeClass(status) {
             switch (status) {
-                case 'Open':
-                    return 'bg-yellow-500 text-white';
+                case 'open':
+                    return 'bg-green-300 text-white';
                 case 'In Progress':
                     return 'bg-blue-500 text-white';
                 case 'Resolved':
@@ -223,6 +202,7 @@ export default {
         }
     },
     mounted() {
+        this.fetchUserRole();
         this.fetchTickets();
     },
 };
