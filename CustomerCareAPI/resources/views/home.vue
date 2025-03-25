@@ -57,9 +57,8 @@
                 <div class="px-4 py-6 sm:px-0">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-2xl font-bold text-gray-800">My Tickets</h2>
-                        <a href="#" @click.prevent="createTicket" class="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors">
-                            Create New Ticket
-                        </a>
+                        <router-link to="/createTicket" class="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors">Create New Ticket</router-link>
+
                     </div>
 
                     <!-- No Tickets Message -->
@@ -187,7 +186,7 @@ export default {
 
                 const response = await axios.get('http://127.0.0.1:8000/api/tickets', {
                     headers: {
-                        'Authorization': `Bearer ${userToken}` // Pass the token in the header
+                        'Authorization': `Bearer ${userToken}`
                     }
                 });
 
@@ -220,10 +219,10 @@ export default {
             this.currentView = view;
         },
         createTicket() {
-            // Implement ticket creation logic here
+
         },
         viewTicket(ticketId) {
-            // Implement ticket viewing logic here
+
         },
     },
     mounted() {
