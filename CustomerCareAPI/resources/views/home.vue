@@ -158,7 +158,6 @@ export default {
         async fetchTickets() {
             try {
                 this.loading = true;
-
                 const userToken = localStorage.getItem('userToken');
 
                 const response = await axios.get('http://127.0.0.1:8000/api/tickets', {
@@ -201,7 +200,6 @@ export default {
             this.$router.push({ name: 'TicketDetails', params: { id: ticketId } });
         },
         openTicket(ticketId) {
-
             const userId = this.userId;
             const token = localStorage.getItem('userToken');
             const ticket = this.ticketsNotOpened.find(t => t.id === ticketId);

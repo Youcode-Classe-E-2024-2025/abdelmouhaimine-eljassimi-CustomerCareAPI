@@ -104,31 +104,24 @@
                 <h2 class="text-lg font-medium text-gray-900 mb-4">
                     Agent Actions
                 </h2>
-                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <div>
-                        <label for="status" class="block text-sm font-medium text-gray-700 mb-2">Update Status</label>
-                        <select id="status" name="status" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            <option value="open" selected>Open</option>
-                            <option value="in-progress">In Progress</option>
-                            <option value="resolved">Resolved</option>
-                            <option value="closed">Closed</option>
-                        </select>
+                <form @submit.prevent="updateTicketStatus">
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <div>
+                            <label for="status" class="block text-sm font-medium text-gray-700 mb-2">Update Status</label>
+                            <select v-model="status" id="status" name="status" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                                <option value="open" selected>Open</option>
+                                <option value="in_progress">In Progress</option>
+                                <option value="resolved">Resolved</option>
+                                <option value="closed">Closed</option>
+                            </select>
+                        </div>
                     </div>
-                    <div>
-                        <label for="assignee" class="block text-sm font-medium text-gray-700 mb-2">Assign To</label>
-                        <select id="assignee" name="assignee" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            <option value="">Unassigned</option>
-                            <option value="agent1">Agent 1</option>
-                            <option value="agent2">Agent 2</option>
-                            <option value="agent3">Agent 3</option>
-                        </select>
+                    <div class="mt-4">
+                        <button type="submit" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            Update Ticket
+                        </button>
                     </div>
-                </div>
-                <div class="mt-4">
-                    <button type="button" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                        Update Ticket
-                    </button>
-                </div>
+                </form>
             </div>
         </div>
 
@@ -220,6 +213,7 @@ export default {
             ticket: null,
             error: null,
             userRole:null,
+            userId : null,
         };
     },
     methods: {
@@ -253,6 +247,7 @@ export default {
 
                 if (response.status === 200) {
                     this.userRole = response.data.role;
+                    this.userId = response.data.id;
                 }
             } catch (error) {
                 console.error('Error fetching user role:', error);
@@ -266,17 +261,37 @@ export default {
             switch (status) {
                 case 'open':
                     return 'bg-green-500 text-white';
-                case 'In Progress':
+                case 'in_progress':
                     return 'bg-blue-500 text-white';
-                case 'Resolved':
+                case 'resolved':
                     return 'bg-yellow-500 text-white';
-                case 'Closed':
+                case 'closed':
                     return 'bg-gray-500 text-white';
                 default:
                     return '';
             }
         },
-
+        async updateTicketStatus() {
+            try {
+                const userToken = localStorage.getItem('userToken');
+                const response = await axios.put(`http://127.0.0.1:8000/api/tickets/${this.ticket.id}`,
+                    {status: this.status, agent_id: this.userId
+                    },
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${userToken}`,
+                        },
+                    }
+                );
+                if (response.status === 200) {
+                    this.$router.push({ name: 'Dashboard' });
+                    alert('Ticket status updated successfully');
+                }
+            } catch (err) {
+                console.error('Error updating ticket status:', err);
+                alert('Failed to update ticket status. Please try again.');
+            }
+        },
     },
     mounted() {
         this.fetchTicketDetails();
