@@ -284,8 +284,7 @@ export default {
                     }
                 );
                 if (response.status === 200) {
-                    this.$router.push({ name: 'Dashboard' });
-                    alert('Ticket status updated successfully');
+                    this.ticket.status = this.status;
                 }
             } catch (err) {
                 console.error('Error updating ticket status:', err);
