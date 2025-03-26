@@ -93,9 +93,6 @@
                             <div class="p-5">
                                 <div class="flex justify-between items-start mb-4">
                                     <h3 class="text-lg font-semibold text-blue-600 truncate">{{ ticket.title }}</h3>
-                                    <span :class="getStatusBadgeClass(ticket.status)" class="px-2 py-1 text-xs font-semibold rounded-full">
-                    {{ ticket.status }}
-                  </span>
                                 </div>
                                 <p class="text-sm text-gray-600 mb-4 line-clamp-2">{{ ticket.description }}</p>
                                 <div class="flex justify-between items-center text-xs text-gray-500">
