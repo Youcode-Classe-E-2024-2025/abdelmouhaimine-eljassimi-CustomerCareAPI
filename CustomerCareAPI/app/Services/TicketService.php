@@ -4,6 +4,7 @@ namespace App\Services;
 use App\Models\Ticket;
 use Illuminate\Support\Facades\Auth;
 use App\Repositories\ticketRepository;
+use Illuminate\Database\Eloquent\Model;
 
 class TicketService
 {
