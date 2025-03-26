@@ -131,56 +131,31 @@
                     Conversation
                 </h2>
                 <div class="space-y-6">
-                    <!-- Original message -->
-                    <div class="flex">
+                    <div v-for="message in messages" :key="message.id" class="flex">
                         <div class="flex-shrink-0 mr-3">
-                            <img class="h-10 w-10 rounded-full" src="https://ui-avatars.com/api/?name=John+Doe&background=0D8ABC&color=fff" alt="User">
+                            <img class="h-10 w-10 rounded-full"
+                                 :src="message.is_agent ? 'https://ui-avatars.com/api/?name=Support+Team&background=4F46E5&color=fff'
+                                               : 'https://ui-avatars.com/api/?name=User&background=0D8ABC&color=fff'"
+                                 alt="User">
                         </div>
-                        <div class="flex-1 bg-gray-50 rounded-lg p-4">
+                        <div :class="message.is_agent ? 'flex-1 bg-blue-50 rounded-lg p-4' : 'flex-1 bg-gray-50 rounded-lg p-4'">
                             <div class="flex items-center justify-between">
-                                <div class="text-sm font-medium text-gray-900">John Doe</div>
-                                <div class="text-xs text-gray-500">Mar 24, 2025 at 10:34 AM</div>
+                                <div class="text-sm font-medium text-gray-900">
+                                    {{ message.is_agent ? 'Support Team' : 'User' }}
+                                </div>
+                                <div class="text-xs text-gray-500">
+                                    {{ formatDate(message.created_at) }}
+                                </div>
                             </div>
                             <div class="mt-2 text-sm text-gray-700">
-                                <p>I'm having trouble logging into my account. When I enter my credentials and click the login button, the page refreshes but I remain on the login page.</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Support response -->
-                    <div class="flex">
-                        <div class="flex-shrink-0 mr-3">
-                            <img class="h-10 w-10 rounded-full" src="https://ui-avatars.com/api/?name=Support+Team&background=4F46E5&color=fff" alt="Support">
-                        </div>
-                        <div class="flex-1 bg-blue-50 rounded-lg p-4">
-                            <div class="flex items-center justify-between">
-                                <div class="text-sm font-medium text-gray-900">Support Team</div>
-                                <div class="text-xs text-gray-500">Mar 24, 2025 at 11:15 AM</div>
-                            </div>
-                            <div class="mt-2 text-sm text-gray-700">
-                                <p>Hello John, thank you for reaching out. I'm sorry to hear you're having trouble logging in. Could you please tell me which browser and device you're using? Also, do you see any error messages when you try to log in?</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- User reply -->
-                    <div class="flex">
-                        <div class="flex-shrink-0 mr-3">
-                            <img class="h-10 w-10 rounded-full" src="https://ui-avatars.com/api/?name=John+Doe&background=0D8ABC&color=fff" alt="User">
-                        </div>
-                        <div class="flex-1 bg-gray-50 rounded-lg p-4">
-                            <div class="flex items-center justify-between">
-                                <div class="text-sm font-medium text-gray-900">John Doe</div>
-                                <div class="text-xs text-gray-500">Mar 24, 2025 at 11:42 AM</div>
-                            </div>
-                            <div class="mt-2 text-sm text-gray-700">
-                                <p>I'm using Chrome on Windows 10. I don't see any error messages, the page just refreshes and I stay on the login page. I've attached a screenshot of what I see after trying to log in.</p>
+                                <p>{{ message.message }}</p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
 
         <!-- Reply Form Card -->
         <div class="bg-white rounded-lg shadow-md overflow-hidden">
@@ -214,6 +189,7 @@ export default {
             error: null,
             userRole:null,
             userId : null,
+            messages : null,
         };
     },
     methods: {
@@ -226,7 +202,8 @@ export default {
                         Authorization: `Bearer ${userToken}`,
                     },
                 });
-                this.ticket = response.data[0];
+                this.ticket = response.data.ticket;
+                this.messages = response.data.messages;
             } catch (err) {
                 console.error('Error fetching ticket details:', err);
                 this.error = 'Failed to load ticket details. Please try again later.';
@@ -248,6 +225,7 @@ export default {
                 if (response.status === 200) {
                     this.userRole = response.data.role;
                     this.userId = response.data.id;
+                    console.log(this.userId);
                 }
             } catch (error) {
                 console.error('Error fetching user role:', error);

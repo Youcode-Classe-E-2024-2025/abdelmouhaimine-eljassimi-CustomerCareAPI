@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CreateTicketRequest;
+use App\Models\Message;
 use App\Models\Ticket;
 use App\Services\TicketService;
 use Illuminate\Http\Request;
@@ -126,7 +127,13 @@ class TicketController extends Controller
      */
     public function show($id)
     {
-        return response()->json([$this->ticketService->getTicketById($id)], 200);
+        $ticket = $this->ticketService->getTicketById($id);
+        $messages = Message::where('ticket_id', $id)->orderBy('created_at', 'asc')->get();
+
+        return response()->json([
+            'ticket' => $ticket,
+            'messages' => $messages
+        ], 200);
     }
 
     /**
